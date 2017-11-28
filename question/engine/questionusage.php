@@ -727,6 +727,7 @@ class question_usage_by_activity {
     public function process_action($slot, $submitteddata, $timestamp = null) {
         $qa = $this->get_question_attempt($slot);
         $qa->process_action($submitteddata, $timestamp);
+        $qa->process_duration();
         $this->observer->notify_attempt_modified($qa);
     }
 

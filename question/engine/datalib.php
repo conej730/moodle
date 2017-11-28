@@ -137,6 +137,7 @@ class question_engine_data_mapper {
         $record->rightanswer = $qa->get_right_answer_summary();
         $record->responsesummary = $qa->get_response_summary();
         $record->timemodified = time();
+        $record->duration = $qa->get_duration();
         $record->id = $this->db->insert_record('question_attempts', $record);
         $qa->set_database_id($record->id);
 
@@ -376,6 +377,7 @@ SELECT
     qa.rightanswer,
     qa.responsesummary,
     qa.timemodified,
+    qa.duration,
     qas.id AS attemptstepid,
     qas.sequencenumber,
     qas.state,
@@ -440,6 +442,7 @@ SELECT
     qa.rightanswer,
     qa.responsesummary,
     qa.timemodified,
+    qa.duration,
     qas.id AS attemptstepid,
     qas.sequencenumber,
     qas.state,
@@ -502,6 +505,7 @@ SELECT
     qa.rightanswer,
     qa.responsesummary,
     qa.timemodified,
+    qa.duration,
     qas.id AS attemptstepid,
     qas.sequencenumber,
     qas.state,
@@ -566,6 +570,7 @@ ORDER BY
     qa.rightanswer,
     qa.responsesummary,
     qa.timemodified,
+    qa.duration,
     qas.id AS attemptstepid,
     qas.sequencenumber,
     qas.state,
@@ -841,6 +846,7 @@ SELECT
     qa.rightanswer,
     qa.responsesummary,
     qa.timemodified,
+    qa.duration,
     qas.id AS attemptstepid,
     qas.sequencenumber,
     qas.state,
@@ -924,6 +930,7 @@ ORDER BY
         $record->rightanswer = $qa->get_right_answer_summary();
         $record->responsesummary = $qa->get_response_summary();
         $record->timemodified = time();
+        $record->duration = $qa->get_duration();
 
         $this->db->update_record('question_attempts', $record);
     }
@@ -1208,6 +1215,7 @@ ORDER BY
                        {$alias}qa.rightanswer,
                        {$alias}qa.responsesummary,
                        {$alias}qa.timemodified,
+                       {$alias}qa.duration,
                        {$alias}qas.id AS attemptstepid,
                        {$alias}qas.sequencenumber,
                        {$alias}qas.state,

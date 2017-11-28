@@ -134,6 +134,12 @@ class question_attempt {
     protected $responsesummary = null;
 
     /**
+     * @var int duration of time student spent on this question.
+     * Intended for reporting purposes.
+     */
+    protected $duration = null;
+
+    /**
      * @var string plain text summary of the correct response to this question
      * variant the student saw. The format should be similar to responsesummary.
      * Intended for reporting purposes.
@@ -1216,6 +1222,13 @@ class question_attempt {
     }
 
     /**
+     * @return int question attempt duration.
+     */
+    public function get_duration() {
+        return $this->duration;
+    }
+
+    /**
      * @return string a simple textual summary of the correct resonse.
      */
     public function get_right_answer_summary() {
@@ -1250,6 +1263,16 @@ class question_attempt {
             if ($pendingstep->variant_number_changed()) {
                 $this->variant = $pendingstep->get_new_variant_number();
             }
+        }
+    }
+
+    /**
+     * Retrieve the duration spent on this question
+     */
+    public function process_duration() {
+        $starttime = optional_param('timestart', 0, PARAM_INT);
+        if ($starttime != 0) {
+            $this->duration = time() - $starttime + $this->duration;
         }
     }
 
@@ -1460,6 +1483,7 @@ class question_attempt {
         $qa->rightanswer = $record->rightanswer;
         $qa->responsesummary = $record->responsesummary;
         $qa->timemodified = $record->timemodified;
+        $qa->duration = $record->duration;
 
         $qa->behaviour = question_engine::make_behaviour(
                 $record->behaviour, $qa, $preferredbehaviour);

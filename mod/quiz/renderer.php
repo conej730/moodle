@@ -506,6 +506,8 @@ class mod_quiz_renderer extends plugin_renderer_base {
                 'value' => sesskey()));
         $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'scrollpos',
                 'value' => '', 'id' => 'scrollpos'));
+        $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'pagestarttime',
+                'value' => time(), 'id' => 'timestart'));
 
         // Add a hidden field with questionids. Do this at the end of the form, so
         // if you navigate before the form has finished loading, it does not wipe all
