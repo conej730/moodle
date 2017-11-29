@@ -1270,7 +1270,7 @@ class question_attempt {
      * Retrieve the duration spent on this question
      */
     public function process_duration() {
-        $starttime = optional_param('timestart', 0, PARAM_INT);
+        $starttime = optional_param('pagestarttime', 0, PARAM_INT);
         if ($starttime != 0) {
             $this->duration = time() - $starttime + $this->duration;
         }
