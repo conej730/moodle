@@ -1828,10 +1828,6 @@ class quiz_attempt {
         }
 
         $this->quba->process_all_actions($timestamp, $simulatedpostdata);
-
-        $handle = fopen('C:/src/output.log', 'w');
-        fwrite($handle, print_r($this->quba, true)."\n");
-        fclose($handle);
         question_engine::save_questions_usage_by_activity($this->quba);
 
         $this->attempt->timemodified = $timestamp;

@@ -94,10 +94,6 @@ abstract class question_engine {
     public static function save_questions_usage_by_activity(question_usage_by_activity $quba, moodle_database $db = null) {
         $dm = new question_engine_data_mapper($db);
         $observer = $quba->get_observer();
-
-//        $handle = fopen('C:/src/output.log', 'w');
-//        fwrite($handle, print_r($quba, true)."\n");
-//        fclose($handle);
         if ($observer instanceof question_engine_unit_of_work) {
             $observer->save($dm);
         } else {
