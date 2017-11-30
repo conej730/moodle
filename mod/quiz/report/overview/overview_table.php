@@ -107,6 +107,7 @@ class quiz_overview_table extends quiz_attempts_report_table {
                   FROM $from
                  WHERE $where", $params);
         $record->grade = quiz_rescale_grade($record->grade, $this->quiz, false);
+        $record->grade = $record->grade / $this->quiz->grade;
 
         if ($this->is_downloading()) {
             $namekey = 'lastname';
@@ -148,6 +149,7 @@ class quiz_overview_table extends quiz_attempts_report_table {
                 $record = $gradeaverages[$question->slot];
                 $record->grade = quiz_rescale_grade(
                         $record->averagefraction * $question->maxmark, $this->quiz, false);
+                $record->grade = $record->averagefraction;
 
             } else {
                 $record = new stdClass();
@@ -169,9 +171,11 @@ class quiz_overview_table extends quiz_attempts_report_table {
         if (is_null($record->grade)) {
             $average = '-';
         } else if ($question) {
-            $average = quiz_format_question_grade($this->quiz, $record->grade);
+//            $average = quiz_format_question_grade($this->quiz, $record->grade);
+            $average = number_format($record->grade * 100, 2) . "%";
         } else {
-            $average = quiz_format_grade($this->quiz, $record->grade);
+//            $average = quiz_format_grade($this->quiz, $record->grade);
+            $average = number_format($record->grade * 100, 2) . "%";
         }
 
         if ($this->download) {
@@ -223,8 +227,8 @@ class quiz_overview_table extends quiz_attempts_report_table {
             }
             $newsumgrade = quiz_rescale_grade($newsumgrade, $this->quiz);
             $oldsumgrade = quiz_rescale_grade($oldsumgrade, $this->quiz);
-            $grade = html_writer::tag('del', $oldsumgrade) . '/' .
-                    html_writer::empty_tag('br') . $newsumgrade;
+            $grade = html_writer::tag('del', number_format($oldsumgrade / $this->quiz->grade * 100, 2)) . '% /' .
+                    html_writer::empty_tag('br') . number_format($newsumgrade / $this->quiz->grade * 100, 2) . '%';
         }
         return html_writer::link(new moodle_url('/mod/quiz/review.php',
                 array('attempt' => $attempt->attempt)), $grade,
@@ -271,15 +275,18 @@ class quiz_overview_table extends quiz_attempts_report_table {
 
         if (isset($this->regradedqs[$attempt->usageid][$slot])) {
             $gradefromdb = $grade;
-            $newgrade = quiz_rescale_grade(
-                    $this->regradedqs[$attempt->usageid][$slot]->newfraction * $question->maxmark,
-                    $this->quiz, 'question');
-            $oldgrade = quiz_rescale_grade(
-                    $this->regradedqs[$attempt->usageid][$slot]->oldfraction * $question->maxmark,
-                    $this->quiz, 'question');
+//            $newgrade = quiz_rescale_grade(
+//                    number_format($this->regradedqs[$attempt->usageid][$slot]->newfraction,2 ),
+//                    $this->quiz, 'question');
+            $newgrade = number_format($this->regradedqs[$attempt->usageid][$slot]->newfraction * 100,2 );
+//            $oldgrade = quiz_rescale_grade(
+//                    number_format($this->regradedqs[$attempt->usageid][$slot]->oldfraction, 2),
+//                    $this->quiz, 'question');
+            $oldgrade = number_format($this->regradedqs[$attempt->usageid][$slot]->oldfraction * 100,2 );
 
-            $grade = html_writer::tag('del', $oldgrade) . '/' .
-                    html_writer::empty_tag('br') . $newgrade;
+            $grade = html_writer::tag('del', $oldgrade) . '% /' .
+                    html_writer::empty_tag('br') . $newgrade . '%' .
+                    html_writer::empty_tag('br') . $stepdata->duration . " s";
         }
 
         return $this->make_review_link($grade, $attempt, $slot);
