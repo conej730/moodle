@@ -212,10 +212,10 @@ if ($options->marks >= question_display_options::MARK_AND_MAX && quiz_has_grades
         // Now the scaled grade.
         $a = new stdClass();
         $a->grade = html_writer::tag('b', quiz_format_grade($quiz, $grade));
-        $a->maxgrade = quiz_format_grade($quiz, $quiz->grade);
+        $a->maxgrade = quiz_format_grade($quiz, $quiz->questionsperattempt * $quiz->grade / $quiz->sumgrades);
         if ($quiz->grade != 100) {
             $a->percent = html_writer::tag('b', format_float(
-                    $attempt->sumgrades * 100 / $quiz->sumgrades, 0));
+                    $attempt->sumgrades * 100 / ($quiz->questionsperattempt * $quiz->grade / $quiz->sumgrades), 0));
             $formattedgrade = get_string('outofpercent', 'quiz', $a);
         } else {
             $formattedgrade = get_string('outof', 'quiz', $a);

@@ -278,6 +278,10 @@ class question_usage_by_activity {
         return $this->questionattempts[$slot];
     }
 
+    public function get_question_attempts() {
+        return $this->questionattempts;
+    }
+
     /**
      * Get the current state of the attempt at a question.
      * @param int $slot the number used to identify this question within this usage.

@@ -613,6 +613,15 @@ function quiz_has_feedback($quiz) {
     return $cache[$quiz->id];
 }
 
+function quiz_update_questions_per_attempt($questionsperattempt, $quiz) {
+    global $DB;
+
+    $sql = 'UPDATE {quiz}
+            SET questionsperattempt = :qpa
+            WHERE id = :quizid';
+    $DB->execute($sql, array('qpa' => $questionsperattempt, 'quizid' => $quiz->id));
+}
+
 /**
  * Update the sumgrades field of the quiz. This needs to be called whenever
  * the grading structure of the quiz is changed. For example if a question is

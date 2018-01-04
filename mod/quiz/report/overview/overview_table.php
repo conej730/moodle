@@ -169,23 +169,26 @@ class quiz_overview_table extends quiz_attempts_report_table {
      */
     protected function format_average($record, $question = false) {
         if (is_null($record->grade)) {
-            $average = '-';
+            $average_correct = '-';
         } else if ($question) {
 //            $average = quiz_format_question_grade($this->quiz, $record->grade);
-            $average = number_format($record->grade * 100, 2) . "%";
+            $average_correct = number_format($record->grade * 100, 2);
+            $average_wrong = 100 - $average_correct;
         } else {
 //            $average = quiz_format_grade($this->quiz, $record->grade);
-            $average = number_format($record->grade * 100, 2) . "%";
+            $average_correct = number_format($record->grade * 100, 2);
+            $average_wrong = 100 - $average_correct;
         }
 
         if ($this->download) {
-            return $average;
+            return $average_correct;
         } else if (is_null($record->numaveraged) || $record->numaveraged == 0) {
             return html_writer::tag('span', html_writer::tag('span',
-                    $average, array('class' => 'average')), array('class' => 'avgcell'));
+                    $average_correct, array('class' => 'average')), array('class' => 'avgcell'));
         } else {
             return html_writer::tag('span', html_writer::tag('span',
-                    $average, array('class' => 'average')) . ' ' . html_writer::tag('span',
+                    $average_correct . '%', array('class' => 'average_correct', 'style' => 'color: green;')) . ' / ' . html_writer::tag('span',
+                    $average_wrong . '%', array('class' => 'average_wrong', 'style' => 'color: red;')) . ' ' . html_writer::tag('span',
                     '(' . $record->numaveraged . ')', array('class' => 'count')),
                     array('class' => 'avgcell'));
         }
@@ -260,13 +263,13 @@ class quiz_overview_table extends quiz_attempts_report_table {
             $grade = '-';
         } else if (is_null($stepdata->fraction)) {
             if ($state == question_state::$needsgrading) {
-                $grade = get_string('requiresgrading', 'question');
+                $grade = get_string('requiresgrading', 'question') . html_writer::empty_tag('br') . $stepdata->duration . " s";
             } else {
                 $grade = '-';
             }
         } else {
             $grade = quiz_rescale_grade(
-                    $stepdata->fraction * $question->maxmark, $this->quiz, 'question');
+                    $stepdata->fraction * $question->maxmark, $this->quiz, 'question') . html_writer::empty_tag('br') . $stepdata->duration . " s";
         }
 
         if ($this->is_downloading()) {

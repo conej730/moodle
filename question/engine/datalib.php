@@ -421,7 +421,14 @@ ORDER BY
      * @param int $qubaid the id of the usage to load.
      * @param question_usage_by_activity the usage that was loaded.
      */
-    public function load_questions_usage_by_activity($qubaid) {
+    public function load_questions_usage_by_activity($qubaid, $questionsperattempt = -1, $attempt = -1) {
+        $results = $this->db->get_recordset_sql("select count(questionusageid) as numq 
+    from mdl_question_attempts where questionusageid = :quid"
+            , array('quid' => $qubaid));
+        $result = $results->current();
+        $maxattempt = intdiv($result->numq, $questionsperattempt);
+        $attempt = ($attempt - 1) % $maxattempt;
+
         $records = $this->db->get_recordset_sql("
 SELECT
     quba.id AS qubaid,
@@ -459,11 +466,13 @@ LEFT JOIN {question_attempt_step_data} qasd ON qasd.attemptstepid    = qas.id
 
 WHERE
     quba.id = :qubaid
+    AND (:qpat = -1
+    OR (qa.slot - 1) DIV :qpa = :attempt)
 
 ORDER BY
     qa.slot,
     qas.sequencenumber
-    ", array('qubaid' => $qubaid));
+    ", array('qubaid' => $qubaid, 'qpat' => $questionsperattempt, 'qpa' => $questionsperattempt, 'attempt' => $attempt));
 
         if (!$records->valid()) {
             throw new coding_exception('Failed to load questions_usage_by_activity ' . $qubaid);
@@ -579,6 +588,19 @@ ORDER BY
     qas.userid";
 
         }
+
+        $sql = "
+        SELECT
+    {$fields}
+
+FROM {$qubaids->from_question_attempts('qa')}
+JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id
+        AND qas.sequencenumber = {$this->latest_step_for_qa_subquery()}
+
+WHERE
+    {$qubaids->where()} AND
+    qa.slot $slottest
+        ";
 
         $records = $this->db->get_records_sql("
 SELECT

@@ -563,15 +563,19 @@ class quiz_attempt {
             return;
         }
 
-        $this->quba = question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
+        $this->quba = question_engine::load_questions_usage_by_activity($this->attempt->uniqueid, null, $quiz->questionsperattempt, $attempt->attempt);
         $this->slots = $DB->get_records('quiz_slots',
                 array('quizid' => $this->get_quizid()), 'slot',
                 'slot, requireprevious, questionid');
+        $maxattempt = intdiv(count($this->slots), $quiz->questionsperattempt);
+        $this->slots = array_filter($this->slots, function ($s) use ($quiz, $attempt, $maxattempt) {
+            return $quiz->questionsperattempt == -1 || intdiv($s->slot - 1, $quiz->questionsperattempt) == ($attempt->attempt - 1) % $maxattempt;
+        });
         $this->sections = array_values($DB->get_records('quiz_sections',
                 array('quizid' => $this->get_quizid()), 'firstslot'));
 
         $this->link_sections_and_slots();
-        $this->determine_layout();
+        $this->determine_layout($quiz->questionsperattempt, $maxattempt);
         $this->number_questions();
     }
 
@@ -631,6 +635,10 @@ class quiz_attempt {
             } else {
                 $section->lastslot = count($this->slots);
             }
+            if (!isset($this->slots[$section->firstslot])) {
+                $section->firstslot = array_values($this->slots)[0]->slot;
+                $section->lastslot = $section->lastslot + $section->firstslot - 1;
+            }
             for ($slot = $section->firstslot; $slot <= $section->lastslot; $slot += 1) {
                 $this->slots[$slot]->section = $section;
             }
@@ -640,7 +648,7 @@ class quiz_attempt {
     /**
      * Parse attempt->layout to populate the other arrays the represent the layout.
      */
-    protected function determine_layout() {
+    protected function determine_layout($questionsperattempt = -1, $maxattempt = -1) {
         $this->pagelayout = array();
 
         // Break up the layout string into pages.
@@ -663,14 +671,21 @@ class quiz_attempt {
             if ($pagelayout == '') {
                 continue;
             }
-            $this->pagelayout[$page] = explode(',', $pagelayout);
-            foreach ($this->pagelayout[$page] as $slot) {
-                $sectionkey = array_search($this->slots[$slot]->section, $unseensections);
-                if ($sectionkey !== false) {
-                    $this->slots[$slot]->firstinsection = true;
-                    unset($unseensections[$sectionkey]);
-                } else {
-                    $this->slots[$slot]->firstinsection = false;
+            $questionsonpage = explode(',', $pagelayout);
+            foreach ($questionsonpage as $question) {
+                if ($questionsperattempt == -1 || intdiv($question - 1, $questionsperattempt) == ($this->attempt->attempt - 1) % $maxattempt) {
+                    $this->pagelayout[$page][] = $question;
+                }
+            }
+            if (isset($this->pagelayout[$page])) {
+                foreach ($this->pagelayout[$page] as $slot) {
+                    $sectionkey = array_search($this->slots[$slot]->section, $unseensections);
+                    if ($sectionkey !== false) {
+                        $this->slots[$slot]->firstinsection = true;
+                        unset($unseensections[$sectionkey]);
+                    } else {
+                        $this->slots[$slot]->firstinsection = false;
+                    }
                 }
             }
         }
@@ -1072,7 +1087,7 @@ class quiz_attempt {
             }
             return $numbers;
         } else {
-            return $this->pagelayout[$page];
+            return array_values($this->pagelayout)[$page];
         }
     }
 
@@ -2086,7 +2101,12 @@ class quiz_attempt {
         // Add a fragment to scroll down to the question.
         $fragment = '';
         if ($slot !== null) {
-            if ($slot == reset($this->pagelayout[$page])) {
+            if (isset($this->pagelayout[$page])) {
+                $pagelayout = reset($this->pagelayout[$page]);
+            } else {
+                $pagelayout = array_values($this->pagelayout)[$page];
+            }
+            if ($slot == $pagelayout) {
                 // First question on page, go to top.
                 $fragment = '#';
             } else {

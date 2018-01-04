@@ -166,6 +166,10 @@ if (optional_param('savechanges', false, PARAM_BOOL) && confirm_sesskey()) {
         quiz_update_grades($quiz, 0, true);
     }
 
+    // Save the number of questions per attempt for this quiz
+    $questionsperattempt = optional_param('questionsperattempt', -1, PARAM_INT);
+    quiz_update_questions_per_attempt($questionsperattempt, $quiz);
+
     redirect($afteractionurl);
 }
 

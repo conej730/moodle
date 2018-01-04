@@ -1552,6 +1552,7 @@ $string['publicsitefileswarning'] = 'Note: files placed here can be accessed by 
 $string['publicsitefileswarning2'] = 'Note: Files placed here can be accessed by anyone who knows (or can guess) the URL. For security reasons, it is recommended that any backup files are deleted immediately after restoring them.';
 $string['publicsitefileswarning3'] = 'Note: Files placed here can be accessed by anyone who knows (or can guess) the URL. <br />For security reasons, backup files should be saved in the secure backupdata folder only.';
 $string['question'] = 'Question';
+$string['questionsperattempt'] = 'Questions per Attempt';
 $string['questionsinthequestionbank'] = 'Questions in the question bank';
 $string['quotausage'] = 'You have currently used {$a->used} of your {$a->total} limit.';
 $string['readinginfofrombackup'] = 'Reading info from backup';

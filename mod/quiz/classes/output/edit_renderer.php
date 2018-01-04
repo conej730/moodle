@@ -179,6 +179,12 @@ class edit_renderer extends \plugin_renderer_base {
                 'name' => 'maxgrade', 'size' => ($structure->get_decimal_places_for_grades() + 2),
                 'value' => $structure->formatted_quiz_grade(),
                 'class' => 'form-control'));
+        $output .= html_writer::tag('label', get_string('questionsperattempt') . ' ',
+            array('for' => 'inputquestionsperattempt', 'style' => 'margin-left: 5px;'));
+        $output .= html_writer::empty_tag('input', array('type' => 'text', 'id' => 'inputquestionsperattempt',
+            'name' => 'questionsperattempt', 'size' => 3,
+            'value' => $structure->get_quiz()->questionsperattempt,
+            'class' => 'form-control'));
         $output .= html_writer::empty_tag('input', array('type' => 'submit', 'class' => 'btn btn-secondary m-l-1',
                 'name' => 'savechanges', 'value' => get_string('save', 'quiz')));
         $output .= html_writer::end_tag('fieldset');

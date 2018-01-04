@@ -79,9 +79,9 @@ abstract class question_engine {
      * @param moodle_database $db a database connectoin. Defaults to global $DB.
      * @return question_usage_by_activity loaded from the database.
      */
-    public static function load_questions_usage_by_activity($qubaid, moodle_database $db = null) {
+    public static function load_questions_usage_by_activity($qubaid, moodle_database $db = null, $questionsperattempt = -1, $attempt = -1) {
         $dm = new question_engine_data_mapper($db);
-        return $dm->load_questions_usage_by_activity($qubaid);
+        return $dm->load_questions_usage_by_activity($qubaid, $questionsperattempt, $attempt);
     }
 
     /**
