@@ -185,7 +185,15 @@ if (!empty($overtime)) {
 }
 
 // Show marks (if the user is allowed to see marks at the moment).
-$grade = quiz_rescale_grade($attempt->sumgrades, $quiz, false);
+$numquestions = count(explode(",0,", $attempt->layout));
+if ($quiz->questionsperattempt == -1) {
+    $rawgrade = $attempt->sumgrades;
+    $maxmark = $quiz->sumgrades;
+} else {
+    $rawgrade = $attempt->sumgrades * $numquestions / $quiz->questionsperattempt;
+    $maxmark = $quiz->sumgrades / $numquestions * $quiz->questionsperattempt;
+}
+$grade = quiz_rescale_grade($rawgrade, $quiz, false);
 if ($options->marks >= question_display_options::MARK_AND_MAX && quiz_has_grades($quiz)) {
 
     if ($attempt->state != quiz_attempt::FINISHED) {
@@ -202,7 +210,7 @@ if ($options->marks >= question_display_options::MARK_AND_MAX && quiz_has_grades
         if ($quiz->grade != $quiz->sumgrades) {
             $a = new stdClass();
             $a->grade = quiz_format_grade($quiz, $attempt->sumgrades);
-            $a->maxgrade = quiz_format_grade($quiz, $quiz->sumgrades);
+            $a->maxgrade = quiz_format_grade($quiz, $maxmark);
             $summarydata['marks'] = array(
                 'title'   => get_string('marks', 'quiz'),
                 'content' => get_string('outofshort', 'quiz', $a),
@@ -212,7 +220,7 @@ if ($options->marks >= question_display_options::MARK_AND_MAX && quiz_has_grades
         // Now the scaled grade.
         $a = new stdClass();
         $a->grade = html_writer::tag('b', quiz_format_grade($quiz, $grade));
-        $a->maxgrade = quiz_format_grade($quiz, $quiz->questionsperattempt * $quiz->grade / $quiz->sumgrades);
+        $a->maxgrade = quiz_format_grade($quiz, $quiz->grade);
         if ($quiz->grade != 100) {
             $a->percent = html_writer::tag('b', format_float(
                     $attempt->sumgrades * 100 / ($quiz->questionsperattempt * $quiz->grade / $quiz->sumgrades), 0));

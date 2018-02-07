@@ -193,7 +193,8 @@ class quiz_overview_report extends quiz_attempts_report {
                     } else {
                         $header .= ' ';
                     }
-                    $header .= '/' . quiz_rescale_grade($question->maxmark, $quiz, 'question');
+                    $qscaling = ($quiz->questionsperattempt == -1 ? 1 : count($questions) / $quiz->questionsperattempt);
+                    $header .= '/' . quiz_rescale_grade($question->maxmark * $qscaling, $quiz, 'question');
                     $headers[] = $header;
                 }
             }

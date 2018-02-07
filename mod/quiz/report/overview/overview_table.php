@@ -106,7 +106,8 @@ class quiz_overview_table extends quiz_attempts_report_table {
                 SELECT AVG(quiza.sumgrades) AS grade, COUNT(quiza.sumgrades) AS numaveraged
                   FROM $from
                  WHERE $where", $params);
-        $record->grade = quiz_rescale_grade($record->grade, $this->quiz, false);
+        $qscaling = ($this->quiz->questionsperattempt == -1 ? 1 : count($this->questions) / $this->quiz->questionsperattempt);
+        $record->grade = quiz_rescale_grade($record->grade * $qscaling, $this->quiz, false);
         $record->grade = $record->grade / $this->quiz->grade;
 
         if ($this->is_downloading()) {
@@ -207,7 +208,8 @@ class quiz_overview_table extends quiz_attempts_report_table {
             return '-';
         }
 
-        $grade = quiz_rescale_grade($attempt->sumgrades, $this->quiz);
+        $qscaling = ($this->quiz->questionsperattempt == -1 ? 1 : count($this->questions) / $this->quiz->questionsperattempt);
+        $grade = quiz_rescale_grade($attempt->sumgrades * $qscaling, $this->quiz);
         if ($this->is_downloading()) {
             return $grade;
         }
@@ -257,8 +259,13 @@ class quiz_overview_table extends quiz_attempts_report_table {
         }
 
         $stepdata = $this->lateststeps[$attempt->usageid][$slot];
-        $state = question_state::get($stepdata->state);
+        $state = question_state::get($stepdata->state);;
 
+        if ($this->quiz->questionsperattempt == -1) {
+            $qscaling = 1;
+        } else {
+            $qscaling = count($this->questions) / $this->quiz->questionsperattempt;
+        }
         if ($question->maxmark == 0) {
             $grade = '-';
         } else if (is_null($stepdata->fraction)) {
@@ -269,7 +276,7 @@ class quiz_overview_table extends quiz_attempts_report_table {
             }
         } else {
             $grade = quiz_rescale_grade(
-                    $stepdata->fraction * $question->maxmark, $this->quiz, 'question') . html_writer::empty_tag('br') . $stepdata->duration . " s";
+                    $stepdata->fraction * $question->maxmark * $qscaling, $this->quiz, 'question') . html_writer::empty_tag('br') . $stepdata->duration . " s";
         }
 
         if ($this->is_downloading()) {
