@@ -114,8 +114,13 @@ abstract class qtype_multichoice_renderer_base extends qtype_with_combined_feedb
             }
             $class = 'r' . ($value % 2);
             if ($options->correctness && $isselected) {
-                $feedbackimg[] = $this->feedback_image($this->is_right($ans));
-                $class .= ' ' . $this->feedback_class($this->is_right($ans));
+                $qresult = $this->is_right($ans);
+                if ($qresult != -1) {
+                    $feedbackimg[] = $this->feedback_image($qresult);
+                    $class .= ' ' . $this->feedback_class($qresult);
+                } else {
+                    $feedbackimg[] = '';
+                }
             } else {
                 $feedbackimg[] = '';
             }
@@ -281,6 +286,8 @@ class qtype_multichoice_multi_renderer extends qtype_multichoice_renderer_base {
     protected function is_right(question_answer $ans) {
         if ($ans->fraction > 0) {
             return 1;
+        } elseif ($ans->fraction == 0) {
+            return -1;
         } else {
             return 0;
         }
