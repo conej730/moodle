@@ -990,6 +990,8 @@ class mod_quiz_renderer extends plugin_renderer_base {
         }
 
         // Prepare table header.
+        $numquestions = count(explode(",0,", $viewobj->attempts[array_keys($viewobj->attempts)[0]]->layout));
+        $markscaling = ($quiz->questionsperattempt == -1 ? 1 : $quiz->questionsperattempt / $numquestions);
         $table = new html_table();
         $table->attributes['class'] = 'generaltable quizattemptsummary';
         $table->head = array();
@@ -1005,7 +1007,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $table->size[] = '';
         if ($viewobj->markcolumn) {
             $table->head[] = get_string('marks', 'quiz') . ' / ' .
-                    quiz_format_grade($quiz, $quiz->sumgrades);
+                    quiz_format_grade($quiz, $quiz->sumgrades * $markscaling);
             $table->align[] = 'center';
             $table->size[] = '';
         }
@@ -1052,7 +1054,7 @@ class mod_quiz_renderer extends plugin_renderer_base {
             }
 
             // Ouside the if because we may be showing feedback but not grades.
-            $attemptgrade = quiz_rescale_grade($attemptobj->get_sum_marks(), $quiz, false);
+            $attemptgrade = quiz_rescale_grade($attemptobj->get_sum_marks() / $markscaling, $quiz, false);
 
             if ($viewobj->gradecolumn) {
                 if ($attemptoptions->marks >= question_display_options::MARK_AND_MAX &&
