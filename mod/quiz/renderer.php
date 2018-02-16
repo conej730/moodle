@@ -1145,15 +1145,17 @@ class mod_quiz_renderer extends plugin_renderer_base {
         $resultinfo = '';
 
         if ($viewobj->overallstats) {
+            $numquestions = count(explode(",0,", $viewobj->attempts[array_keys($viewobj->attempts)[0]]->layout));
+            $gradescaling = ($quiz->questionsperattempt == -1 ? 1 : $quiz->grade * $numquestions / $quiz->questionsperattempt / 10);
             if ($viewobj->moreattempts) {
                 $a = new stdClass();
                 $a->method = quiz_get_grading_option_name($quiz->grademethod);
-                $a->mygrade = quiz_format_grade($quiz, $viewobj->mygrade);
+                $a->mygrade = quiz_format_grade($quiz, $viewobj->mygrade * $gradescaling);
                 $a->quizgrade = quiz_format_grade($quiz, $quiz->grade);
                 $resultinfo .= $this->heading(get_string('gradesofar', 'quiz', $a), 3);
             } else {
                 $a = new stdClass();
-                $a->grade = quiz_format_grade($quiz, $viewobj->mygrade);
+                $a->grade = quiz_format_grade($quiz, $viewobj->mygrade * $gradescaling);
                 $a->maxgrade = quiz_format_grade($quiz, $quiz->grade);
                 $a = get_string('outofshort', 'quiz', $a);
                 $resultinfo .= $this->heading(get_string('yourfinalgradeis', 'quiz', $a), 3);
