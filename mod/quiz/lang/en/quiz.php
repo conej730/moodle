@@ -387,7 +387,7 @@ $string['grademethod_help'] = 'When multiple attempts are allowed, the following
 * First attempt (all other attempts are ignored)
 * Last attempt (all other attempts are ignored)';
 $string['gradesdeleted'] = 'Quiz grades deleted';
-$string['gradesofar'] = '{$a->method}: {$a->mygrade} / {$a->quizgrade}.';
+$string['gradesofar'] = '{$a->method}: {$a->mygrade} / {$a->quizgrade}';
 $string['gradetopassnotset'] = 'This quiz does not have a grade to pass set so you cannot use this option. Please use the require grade setting instead.';
 $string['gradetopassmustbeset'] = 'Grade to pass cannot be zero as this quiz has its completion method set to require passing grade. Please set a non-zero value.';
 $string['gradingdetails'] = 'Marks for this submission: {$a->raw}/{$a->max}.';
@@ -939,4 +939,4 @@ $string['withsummary'] = 'with summary statistics';
 $string['wronguse'] = 'You can not use this page like that';
 $string['xhtml'] = 'XHTML';
 $string['youneedtoenrol'] = 'You need to enrol in this course before you can attempt this quiz';
-$string['yourfinalgradeis'] = 'Your final grade for this quiz is {$a}.';
+$string['yourfinalgradeis'] = 'Your final grade for this quiz is {$a}';
