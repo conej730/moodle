@@ -2086,9 +2086,10 @@ class quiz_attempt {
         }
 
         // Fix up $page.
+        $qpa = count($this->get_slots());
         if ($page == -1) {
             if ($slot !== null && !$showall) {
-                $page = $this->get_question_page($slot);
+                $page = $this->get_question_page($slot) % $qpa;
             } else {
                 $page = 0;
             }
@@ -2454,6 +2455,7 @@ abstract class quiz_nav_panel_base {
      */
     public function get_question_buttons() {
         $buttons = array();
+        $qpa = count($this->attemptobj->get_slots());
         foreach ($this->attemptobj->get_slots() as $slot) {
             if ($heading = $this->attemptobj->get_heading_before_slot($slot)) {
                 $buttons[] = new quiz_nav_section_heading(format_string($heading));
@@ -2471,7 +2473,7 @@ abstract class quiz_nav_panel_base {
                 $button->stateclass = 'complete';
             }
             $button->statestring = $this->get_state_string($qa, $showcorrectness);
-            $button->page        = $this->attemptobj->get_question_page($slot);
+            $button->page        = $this->attemptobj->get_question_page($slot) % $qpa;
             $button->currentpage = $this->showall || $button->page == $this->page;
             $button->flagged     = $qa->is_flagged();
             $button->url         = $this->get_question_url($slot);
